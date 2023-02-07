@@ -41,3 +41,10 @@ Total score: 70/100
 
 Grading for section 011 completed
 ```
+
+A grades.csv file is generated in the same section folder
+
+grades.csv file structure
+
+| Name | Points | Comments | error | error_msg |
+| ------ | ------ | ------ | ------ | ------ |

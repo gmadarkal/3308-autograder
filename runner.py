@@ -7,7 +7,7 @@ section_number = input("Please enter section number\n")
 submissions_folder = input(f"Please paste the folder containing submissions for section: {section_number} \n")
 
 submissions = os.listdir(submissions_folder)
-
+print(f"Found {len(submissions)} in this section")
 if lab_number == 4:
     lab4_obj = Lab4(submissions_folder, submissions)
     grades = lab4_obj.start()

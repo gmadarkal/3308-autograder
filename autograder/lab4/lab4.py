@@ -283,7 +283,9 @@ class Lab4:
         for submission in self.submissions:
             if os.path.isdir(os.path.join(self.submissions_folder, submission)):
                 try:
+                    self.log_info(f"Grading submission: {submission}")
                     total_points, submission_remarks, graded_sections = self.grade(submission)
+                    self.log_info(f"Total score for student: {submission} = {total_points}/100")
                     grades.append({
                         "name": submission,
                         "points": total_points,
