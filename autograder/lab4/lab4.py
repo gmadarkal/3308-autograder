@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import os
 import json
+import traceback
 
 class Lab4:
     def __init__(self, submissions_folder, submissions, debug=False) -> None:
@@ -9,7 +10,7 @@ class Lab4:
         self.files = ['index.html', 'projects.html', 'hobbies.html', 'resume.html']
         self.debug = debug
         self.file_obj = None
-        self.views_folder = 'Lab_Website/views/'
+        self.views_folder = "Lab_Website\\views"
     
     def log_info(self, msg):
         print(msg)
@@ -30,7 +31,7 @@ class Lab4:
         if navbar_icon:
             total_points += 1
         else:
-            comments.append("-2: navbar icon missing")
+            comments.append("-1: navbar icon missing")
         navbar_links = navbar_obj.find_all("li")
         pages = ['index.html', 'hobbies.html', 'projects.html', 'resume.html']
         relative_pages = ['./index.html', './hobbies.html', './projects.html', './resume.html']
@@ -44,8 +45,10 @@ class Lab4:
                     count += 1
                     total_points += 0.5
         except:
-            if count < 4:
-                comments.append('navbar is missing links')
+            self.log_debug("exception occured while grading navbar. Proabaly a tag is missing. Requires further inspection of file")
+        
+        if count < 4:
+            comments.append(f'-{(4-count)*0.5}: navbar is missing links')
 
         return total_points, comments
 
@@ -53,12 +56,16 @@ class Lab4:
         total_points = 0
         comments = []
 
-        footer_obj = self.file_obj.footer
+        footer_obj = self.file_obj.footer or self.file_obj.find(id="footer")
         if not footer_obj:
-            comments.append("-3: footer does not exist")
-            return total_points, comments
+            footer_res = self.file_obj.find_all('div', { "class": "footer" })
+            if footer_res:
+                footer_obj = footer_res[0]
+            else:
+                comments.append("-3: footer does not exist")
+                return total_points, comments
         footer_links = footer_obj.find_all("a")
-        if not footer_links:
+        if len(footer_links) == 0:
             comments.append("-3: footer has no links")
         
         total_points += 1
@@ -77,12 +84,12 @@ class Lab4:
     def grade_homepage(self):
         total_points = 0
         comments = []
-        image = self.file_obj.find(id="hero_image")
+        image = self.file_obj.find(id="hero-image")
         if image:
             total_points += 3
         else:
             comments.append("-3: Could not find image in home page")
-        desc = self.file_obj.find(id="hero_desc")
+        desc = self.file_obj.find(id="hero-desc")
         if desc:
             total_points += 3
         else:
@@ -98,7 +105,10 @@ class Lab4:
         # card title (0.25), 
         # card desc (0.25)
         for i in range(3):
-            hobby_card = self.file_obj.find(id=f"hobby_card{i}")
+            hobby_card = self.file_obj.find(id=f"hobby-card{i+1}")
+            if not hobby_card:
+                comments.append(f"-1: hobby card {i+1} is missing")
+                continue
             card_img = hobby_card.find('img')
             if card_img:
                 total_points += 0.5
@@ -119,7 +129,7 @@ class Lab4:
             else:
                 comments.append("-0.25: hobby desc not found")
         
-        return total_points
+        return total_points, comments
 
     def grade_projects(self):
         total_points = 0
@@ -131,20 +141,27 @@ class Lab4:
         # 4 points for indicators on carousel
         # 2 points for no. of projects
         projects_obj = self.file_obj.find(id="projects")
+        if not projects_obj:
+            obj = self.file_obj.find_all("div", {"class": "projects"})
+            if len(obj) > 0:
+                projects_obj = obj[0]
+            if not projects_obj:
+                comments.append("-12: projects div not found")
+                return total_points, comments
         project_items = projects_obj.find_all("div", {"class": "carousel-item"})
         quantity = len(project_items)
         if len(project_items) >= 3:
             total_points += 2
         else:
             comments.append("-2: less than 3 projects added")
-        bottom_indicators = projects_obj.find(id="carousel_bottom_indicators")
-        buttons = bottom_indicators.findAll("button")
+        bottom_indicators = projects_obj.find(id="carousel-bottom-indicators")
+        buttons = bottom_indicators.find_all("button")
         if len(buttons) >= 3:
             total_points += 2
         else:
             comments.append('-2: carousel bottom indicators are not found')
-        prev_control = projects_obj.find(id="carousel_control_prev")
-        next_control = projects_obj.find(id="carousel_control_next")
+        prev_control = projects_obj.find(id="carousel-control-prev")
+        next_control = projects_obj.find(id="carousel-control-next")
         if prev_control:
             total_points += 1
         else:
@@ -154,7 +171,7 @@ class Lab4:
         else:
             comments.append("-1: next project indicator is not found")
         for i in range(quantity):
-            carousel_item = projects_obj.find(id=f"carousel_item{i}")
+            carousel_item = projects_obj.find(id=f"carousel_item{i+1}")
             card_img = carousel_item.find('img')
             if card_img:
                 total_points += 1
@@ -191,10 +208,10 @@ class Lab4:
         css_lib_found = False
         for lib in css_libs:
             libs_found = [
-                lib.get("href").index("materialize") > -1,
-                lib.get("href").index("bulma") > -1,
-                lib.get("href").index("uikit") > -1,
-                lib.get("href").index("semantic") > -1
+                "materialize" in lib.get("href"),
+                "bulma" in lib.get("href"),
+                "uikit" in lib.get("href"),
+                "semantic" in lib.get("href")
             ]
             if any(libs_found):
                 total_points += 12
@@ -204,7 +221,13 @@ class Lab4:
             comments.append("-12: did not use css libraries mentioned in the lab requirement")
 
         resume_obj = self.file_obj.find(id="resume")
-        tables = resume_obj.findAll("table")
+        if not resume_obj:
+            obj = self.file_obj.find_all("div", {"class": "resume"})
+            if len(obj) == 0:
+                comments.append("-6: resume div not found")
+                return total_points, comments
+            resume_obj = obj[0]
+        tables = resume_obj.find_all("table")
         if len(tables) > 0:
             total_points += 6
         else:
@@ -214,46 +237,80 @@ class Lab4:
 
     def get_submission_file_obj(self, submission, sub_section_name):
         file_path = os.path.join(self.submissions_folder, submission, self.views_folder, sub_section_name)
-        file_obj = BeautifulSoup(file_path, 'html.parser')
+        with open(file_path, encoding='utf8') as html_file:
+            file_contents = html_file.read()
+        file_obj = BeautifulSoup(file_contents, 'html.parser')
         return file_obj
 
     def grade(self, submission):
-        with open('./rubric/lab4.json') as reader:
+        rubric_path = './autograder/lab4/rubric/lab4.json'
+        with open(os.path.abspath(rubric_path)) as reader:
             rubric_contents = reader.read()
         graded_sections = []
         rubric = json.loads(rubric_contents)
         submission_remarks = []
         total_points = 0
         for section in rubric['lab4']:
-            section_points, section_comments = 0, []
+            section_points = 0
+            section_comments = []
             self.log_debug(f'Grading section: {section}')
             self.log_debug(f'Grading common components section: {section}')
             for sub_section in section['sub_sections']:
                 graded_sections.append(f"{section['section_name']}_{sub_section['name']}")
                 self.log_debug(f"grading subsection {sub_section['name']}, total points: {sub_section['points']}")
-                sub_section_points, sub_section_comments = 0, []
+                sub_section_points = 0
+                sub_section_comments = []
                 self.file_obj = self.get_submission_file_obj(submission, sub_section['name'])
                 for item in sub_section['items']:
                     self.log_debug(f"grading item: {item['component_id']}, total points: {item['item_point']}")
+                    # if sub_section['name'] == 'hobbies.html':
+                    #     print("soemthing")
                     item_points, item_comments = eval(f"self.grade_{item['component_id']}()")
                     sub_section_points += item_points
                     sub_section_comments.extend(item_comments)
-            section_points += sub_section_points
-            section_comments.extend(sub_section_comments)
-        total_points += sub_section_points
-        submission_remarks.extend(sub_section_comments)
+                details = [f"[Section: {section['section_name']} Subsection: {sub_section['name']}]"]
+                section_points += sub_section_points
+                if len(sub_section_comments) > 0:
+                    section_comments.extend(details)
+                    section_comments.extend(sub_section_comments)
+            total_points += section_points
+            submission_remarks.extend(section_comments)
     
         return total_points, submission_remarks, graded_sections
 
     def start(self):
         grades = []
         for submission in self.submissions:
-            total_points, submission_remarks, graded_sections = self.grade(submission)
-            grades.append({
-                "name": submission,
-                "points": total_points,
-                "remarks": submission_remarks,
-                "graded_sections": graded_sections
-            })
+            if os.path.isdir(os.path.join(self.submissions_folder, submission)):
+                try:
+                    total_points, submission_remarks, graded_sections = self.grade(submission)
+                    grades.append({
+                        "name": submission,
+                        "points": total_points,
+                        "remarks": submission_remarks,
+                        "graded_sections": graded_sections,
+                        "error": False,
+                        "error_msg": None
+                    })
+                except FileNotFoundError:
+                    self.log_info(f"Submission file not found for: {submission}")
+                    grades.append({
+                        "name": submission,
+                        "points": 0,
+                        "remarks": [],
+                        "graded_sections": {},
+                        "error": True,
+                        "error_msg": f"Submission file not found for: {submission}"
+                    })
+                except Exception:
+                    self.log_info(f"Exception occurred while grading {submission}")
+                    grades.append({
+                        "name": submission,
+                        "points": 0,
+                        "remarks": [],
+                        "graded_sections": {},
+                        "error": True,
+                        "error_msg": traceback.format_exc()
+                    })
                 
         return grades
