@@ -9,6 +9,7 @@ class Lab4:
         self.files = ['index.html', 'projects.html', 'hobbies.html', 'resume.html']
         self.debug = debug
         self.file_obj = None
+        self.views_folder = 'Lab_Website/views/'
     
     def log_info(self, msg):
         print(msg)
@@ -89,14 +90,14 @@ class Lab4:
 
         return total_points, comments
 
-    def grade_hobbies(self, quantity):
+    def grade_hobbies(self):
         total_points = 0
         comments = []
         # 1 point for including 
         # card image (0.5), 
         # card title (0.25), 
         # card desc (0.25)
-        for i in range(quantity):
+        for i in range(3):
             hobby_card = self.file_obj.find(id=f"hobby_card{i}")
             card_img = hobby_card.find('img')
             if card_img:
@@ -120,7 +121,7 @@ class Lab4:
         
         return total_points
 
-    def grade_projects(self, quantity):
+    def grade_projects(self):
         total_points = 0
         comments = []
         # 2 points per project 
@@ -129,11 +130,13 @@ class Lab4:
             # card desc (0.5)
         # 4 points for indicators on carousel
         # 2 points for no. of projects
-        if quantity >= 3:
+        projects_obj = self.file_obj.find(id="projects")
+        project_items = projects_obj.find_all("div", {"class": "carousel-item"})
+        quantity = len(project_items)
+        if len(project_items) >= 3:
             total_points += 2
         else:
             comments.append("-2: less than 3 projects added")
-        projects_obj = self.file_obj.find(id="projects")
         bottom_indicators = projects_obj.find(id="carousel_bottom_indicators")
         buttons = bottom_indicators.findAll("button")
         if len(buttons) >= 3:
@@ -209,6 +212,11 @@ class Lab4:
 
         return total_points, comments
 
+    def get_submission_file_obj(self, submission, sub_section_name):
+        file_path = os.path.join(self.submissions_folder, submission, self.views_folder, sub_section_name)
+        file_obj = BeautifulSoup(file_path, 'html.parser')
+        return file_obj
+
     def grade(self, submission):
         with open('./rubric/lab4.json') as reader:
             rubric_contents = reader.read()
@@ -220,14 +228,11 @@ class Lab4:
             section_points, section_comments = 0, []
             self.log_debug(f'Grading section: {section}')
             self.log_debug(f'Grading common components section: {section}')
-            for comp in section['common_components']:
-                comp_points, comp_comments = eval(f"self.grade_{comp['component_id']}()")
-                section_points += comp_points
-                section_comments.extend(comp_comments)
             for sub_section in section['sub_sections']:
                 graded_sections.append(f"{section['section_name']}_{sub_section['name']}")
                 self.log_debug(f"grading subsection {sub_section['name']}, total points: {sub_section['points']}")
                 sub_section_points, sub_section_comments = 0, []
+                self.file_obj = self.get_submission_file_obj(submission, sub_section['name'])
                 for item in sub_section['items']:
                     self.log_debug(f"grading item: {item['component_id']}, total points: {item['item_point']}")
                     item_points, item_comments = eval(f"self.grade_{item['component_id']}()")
@@ -241,15 +246,14 @@ class Lab4:
         return total_points, submission_remarks, graded_sections
 
     def start(self):
-        views_folder = 'Lab_Website/views/'
         grades = []
         for submission in self.submissions:
-                total_points, submission_remarks, graded_sections = self.grade(submission)
-                grades.append({
-                    "name": submission,
-                    "points": total_points,
-                    "remarks": submission_remarks,
-                    "graded_sections": graded_sections
-                })
+            total_points, submission_remarks, graded_sections = self.grade(submission)
+            grades.append({
+                "name": submission,
+                "points": total_points,
+                "remarks": submission_remarks,
+                "graded_sections": graded_sections
+            })
                 
         return grades
