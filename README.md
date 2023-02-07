@@ -1,7 +1,7 @@
 # Grading Automation Script
 
 This script offers a command line interface. When initiated the scripts requires a lab section folder path (eg: "c://lab4/012/") as input.
-For more information on the rubric and automation script please look at file html-testing-automation.py
+For more information on the rubric and automation script please look at file lab4.py
 
 ## Running the script
 
