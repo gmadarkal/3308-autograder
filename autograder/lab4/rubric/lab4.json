@@ -1,0 +1,78 @@
+{
+    "lab4": [
+        {
+            "section_name": "Part A",
+            "common_components": [
+                {
+                    "component_id": "navbar",
+                    "item_title": "nav bar check",
+                    "item_point": 5,
+                    "grading_type": "exact"
+                },
+                {
+                    "component_id": "footer",
+                    "item_title": "footer check",
+                    "item_point": 3,
+                    "grading_type": "exact"
+                }
+            ],
+            "sub_sections": [
+                {
+                    "name": "index.html",
+                    "points": 15,
+                    "items": [
+                        {
+                            "component_id": "homepage",
+                            "item_title": "home page check",
+                            "item_point": 7,
+                            "grading_type": "exact"
+                        }
+                    ]
+                },
+                {
+                    "name": "hobbies.html",
+                    "points": 15,
+                    "items": [
+                        {
+                            "component_id": "hobbies",
+                            "item_title": "Cards to display hobbies",
+                            "item_point": 5,
+                            "grading_type": "exact",
+                            "component_qty": 3
+                        }
+                    ]
+                },
+                {
+                    "name": "projects.html",
+                    "points": 15,
+                    "items": [
+                        {
+                            "component_id": "projects",
+                            "item_title": "Cards to display hobbies",
+                            "item_point": 12,
+                            "grading_type": "exact",
+                            "component_qty": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "section_name": "Part B",
+            "sub_sections": [
+                {
+                    "name": "resume.html",
+                    "points": 15,
+                    "items": [
+                        {
+                            "component_id": "resume",
+                            "item_title": "Resume page",
+                            "item_point": 18,
+                            "grading_type": "exact"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
