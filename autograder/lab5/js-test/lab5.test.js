@@ -39,7 +39,7 @@ describe("testing lab5", () => {
     let exitEarly = false
     labFiles.forEach((file) => {
         if (fs.existsSync(path.join(filePath, file))) {
-            dirStructurePoints['points'] += 5
+            dirStructurePoints['points'] += 2.5
             totalPoints['dirStructurePoints'] = dirStructurePoints;
         } else {
             dirStructurePoints['comments'] += "-5: directory structure is not followed"
