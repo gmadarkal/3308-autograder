@@ -3,6 +3,18 @@
 This script offers a command line interface. When initiated the scripts requires a lab section folder path (eg: "c://lab4/012/") as input.
 For more information on the rubric and automation script please look at file lab4.py
 
+## Setup
+
+- Install node environment
+
+``` https://nodejs.org/en/download/ ```
+
+- Install node_module by changing the directory to the respective lab
+
+``` cd ./autograder/lab5/ ```
+
+``` npm install ``` 
+
 ## Running the script
 
 python runner.py

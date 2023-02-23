@@ -5,13 +5,6 @@ const fs = require('fs');
 console.log("env:", process.env.JEST_ENVIRONMENT)
 const http = require("https");
 const path = require("path");
-// async function getFileContents(path) {
-//     return new Promise((resolve, rej) => {
-//         fs.readFile(path, (e, data) => {
-//             resolve(data);
-//         });
-//     });
-// }
 
 const mockFn = (oldfnName, newfnName, scriptstr) => {
     let modifiedScript = scriptstr.replaceAll(oldfnName, newfnName)
