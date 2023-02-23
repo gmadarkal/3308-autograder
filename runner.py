@@ -1,5 +1,6 @@
 import os
 from autograder.lab4.lab4 import Lab4
+from autograder.lab5.lab5 import Lab5
 from autograder.reporter.csv_reporter import CSVReporter
 
 lab_number = int(input("Please enter lab number\n"))
@@ -14,5 +15,8 @@ if lab_number == 4:
     reporter = CSVReporter(submissions_folder)
     reporter.report(grades)
     print(f"Completed grading section {section_number}")
+elif lab_number == 5:
+    lab5_obj = Lab5(submissions_folder, submissions)
+    grades = lab5_obj.start()
 else:
     print(f"Only lab 4 supported in the current version of autograde")

@@ -1,0 +1,80 @@
+{
+    "lab4": [
+        {
+            "section_name": "Part A",
+            "sub_sections": [
+                {
+                    "name": "index.html",
+                    "points": 20,
+                    "items": [
+                        {
+                            "component_id": "calendar",
+                            "item_title": "calendar check",
+                            "item_point": 20,
+                            "grading_type": "exact"
+                        }
+                    ]
+                },
+                {
+                    "name": "script.js",
+                    "points": 40,
+                    "items": [
+                        {
+                            "component_id": "init_data",
+                            "item_title": "initialize data check",
+                            "item_point": 3,
+                            "grading_type": "exact"
+                        },
+                        {
+                            "component_id": "init_content",
+                            "item_title": "initialize content check",
+                            "item_point": 10,
+                            "grading_type": "exact"
+                        },
+                        {
+                            "component_id": "update_dom",
+                            "item_title": "update dom check",
+                            "item_point": 10,
+                            "grading_type": "exact"
+                        },
+                        {
+                            "component_id": "update_location_preferences",
+                            "item_title": "update_location_preferences check",
+                            "item_point": 2,
+                            "grading_type": "exact"
+                        },
+                        {
+                            "component_id": "open_event_modal",
+                            "item_title": "open_event_modal check",
+                            "item_point": 10,
+                            "grading_type": "exact"
+                        },
+                        {
+                            "component_id": "open_event_from_modal",
+                            "item_title": "open_event_from_modal check",
+                            "item_point": 5,
+                            "grading_type": "exact"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "section_name": "Part B",
+            "sub_sections": [
+                {
+                    "name": "script.js",
+                    "points": 20,
+                    "items": [
+                        {
+                            "component_id": "update_tooltips",
+                            "item_title": "update_tooltips check",
+                            "item_point": 20,
+                            "grading_type": "exact"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "js-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "runner.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node runner.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.4.3",
+    "jest-environment-jsdom": "^29.4.3"
+  },
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "jssoup": "^0.0.15",
+    "node-fetch": "^2.6.9"
+  }
+}
