@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import os
 import json
 import traceback
+from .constants import COMPONENT_IDS
 
 class Lab4:
     def __init__(self, submissions_folder, submissions, debug=False) -> None:
@@ -27,7 +28,7 @@ class Lab4:
             comments.append("-5: navbar is missing")
             return total_points, comments
         total_points += 2
-        navbar_icon = navbar_obj.find(id="navbar-icon")
+        navbar_icon = navbar_obj.find(id=COMPONENT_IDS.get("NAVBAR_ICON", ""))
         if navbar_icon:
             total_points += 1
         else:
@@ -56,7 +57,7 @@ class Lab4:
         total_points = 0
         comments = []
 
-        footer_obj = self.file_obj.footer or self.file_obj.find(id="footer")
+        footer_obj = self.file_obj.footer or self.file_obj.find(id=COMPONENT_IDS.get("FOOTER", ""))
         if not footer_obj:
             footer_res = self.file_obj.find_all('div', { "class": "footer" })
             if footer_res:
@@ -84,12 +85,12 @@ class Lab4:
     def grade_homepage(self):
         total_points = 0
         comments = []
-        image = self.file_obj.find(id="hero-image")
+        image = self.file_obj.find(id=COMPONENT_IDS.get("SELF_IMAGE", ""))
         if image:
             total_points += 3
         else:
             comments.append("-3: Could not find image in home page")
-        desc = self.file_obj.find(id="hero-desc")
+        desc = self.file_obj.find(id=COMPONENT_IDS.get("SELF_DESC", ""))
         if desc:
             total_points += 3
         else:
@@ -105,7 +106,7 @@ class Lab4:
         # card title (0.25), 
         # card desc (0.25)
         for i in range(3):
-            hobby_card = self.file_obj.find(id=f"hobby-card{i+1}")
+            hobby_card = self.file_obj.find(id=f'{COMPONENT_IDS.get("HOBBY_CARDS_PREFIX", "")}{i+1}')
             if not hobby_card:
                 comments.append(f"-1: hobby card {i+1} is missing")
                 continue
@@ -140,7 +141,7 @@ class Lab4:
             # card desc (0.5)
         # 4 points for indicators on carousel
         # 2 points for no. of projects
-        projects_obj = self.file_obj.find(id="projects")
+        projects_obj = self.file_obj.find(id=COMPONENT_IDS.get("PROJECTS_CONTAINER", ""))
         if not projects_obj:
             obj = self.file_obj.find_all("div", {"class": "projects"})
             if len(obj) > 0:
@@ -154,14 +155,14 @@ class Lab4:
             total_points += 2
         else:
             comments.append("-2: less than 3 projects added")
-        bottom_indicators = projects_obj.find(id="carousel-bottom-indicators")
+        bottom_indicators = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_BTM_INDS", ""))
         buttons = bottom_indicators.find_all("button")
         if len(buttons) >= 3:
             total_points += 2
         else:
             comments.append('-2: carousel bottom indicators are not found')
-        prev_control = projects_obj.find(id="carousel-control-prev")
-        next_control = projects_obj.find(id="carousel-control-next")
+        prev_control = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_CONTROL_PREV", ""))
+        next_control = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_CONTROL_NEXT", ""))
         if prev_control:
             total_points += 1
         else:
@@ -171,7 +172,7 @@ class Lab4:
         else:
             comments.append("-1: next project indicator is not found")
         for i in range(quantity):
-            carousel_item = projects_obj.find(id=f"carousel_item{i+1}")
+            carousel_item = projects_obj.find(id=f'{COMPONENT_IDS.get("CAROUSEL_ITEM_PREFIX", "")}{i+1}')
             card_img = carousel_item.find('img')
             if card_img:
                 total_points += 1
@@ -220,7 +221,7 @@ class Lab4:
         if not css_lib_found:
             comments.append("-12: did not use css libraries mentioned in the lab requirement")
 
-        resume_obj = self.file_obj.find(id="resume")
+        resume_obj = self.file_obj.find(id=COMPONENT_IDS.get("RESUME", ""))
         if not resume_obj:
             obj = self.file_obj.find_all("div", {"class": "resume"})
             if len(obj) == 0:
