@@ -5,6 +5,10 @@ For more information on the rubric and automation script please look at file lab
 
 ## Setup
 
+- Install python dependencies
+
+``` pip install -r requirements.txt ```
+
 - Install node environment
 
 ``` https://nodejs.org/en/download/ ```
