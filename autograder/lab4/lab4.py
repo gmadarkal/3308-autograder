@@ -29,19 +29,26 @@ class Lab4:
             return total_points, comments
         total_points += 2
         navbar_icon = navbar_obj.find(id=COMPONENT_IDS.get("NAVBAR_ICON", ""))
-        if navbar_icon:
-            total_points += 1
-        else:
-            comments.append("-1: navbar icon missing")
-        navbar_links = navbar_obj.find_all("li")
+        if not navbar_icon:
+            navbar_icon = navbar_obj.find_all("img")
+            if len(navbar_icon) >= 1:
+                total_points += 1
+            else:
+                comments.append("-1: navbar icon missing")
+        navbar_links = navbar_obj.find_all("a")
         pages = ['index.html', 'hobbies.html', 'projects.html', 'resume.html']
         relative_pages = ['./index.html', './hobbies.html', './projects.html', './resume.html']
+        relative_pages_alt = ['../views/index.html', '../views/hobbies.html', '../views/projects.html', '../views/resume.html']
         alternate_page_values = ['#']
         try:
             count = 0
             for link in navbar_links:
-                if link.a.get('href').lower() not in pages and link.a.get('href').lower() not in relative_pages:
-                    comments.append('navbar is missing links')
+                if "active" in link.get('class'):
+                    count += 1
+                    total_points += 0.5
+                elif link.get('href').lower() not in pages and link.get('href').lower() not in relative_pages and link.get('href').lower() not in relative_pages_alt:
+                    # do nothing
+                    pass
                 else:
                     count += 1
                     total_points += 0.5
@@ -87,14 +94,14 @@ class Lab4:
         comments = []
         image = self.file_obj.find(id=COMPONENT_IDS.get("SELF_IMAGE", ""))
         if image:
-            total_points += 3
+            total_points += 3.5
         else:
-            comments.append("-3: Could not find image in home page")
+            comments.append("-3.5: Could not find image in home page")
         desc = self.file_obj.find(id=COMPONENT_IDS.get("SELF_DESC", ""))
         if desc:
-            total_points += 3
+            total_points += 3.5
         else:
-            comments.append("-3: Could not find description in home page")
+            comments.append("-3.5: Could not find description in home page")
 
         return total_points, comments
 
@@ -105,6 +112,7 @@ class Lab4:
         # card image (0.5), 
         # card title (0.25), 
         # card desc (0.25)
+        count = 0
         for i in range(3):
             hobby_card = self.file_obj.find(id=f'{COMPONENT_IDS.get("HOBBY_CARDS_PREFIX", "")}{i+1}')
             if not hobby_card:
@@ -129,6 +137,11 @@ class Lab4:
                 total_points += 0.25
             else:
                 comments.append("-0.25: hobby desc not found")
+            count += 1
+        if count == 3:
+            total_points += 4
+        else:
+            comments.append("-4: less than 3 hobby cards found")
         
         return total_points, comments
 
@@ -140,29 +153,47 @@ class Lab4:
             # card title (0.5), 
             # card desc (0.5)
         # 4 points for indicators on carousel
-        # 2 points for no. of projects
+        # 2 points for no. of projects >= 3
         projects_obj = self.file_obj.find(id=COMPONENT_IDS.get("PROJECTS_CONTAINER", ""))
+        deduct_points_for_id = False
         if not projects_obj:
             obj = self.file_obj.find_all("div", {"class": "projects"})
             if len(obj) > 0:
                 projects_obj = obj[0]
-            if not projects_obj:
-                comments.append("-12: projects div not found")
-                return total_points, comments
+            else:
+                projects_obj = self.file_obj.html or self.file_obj.body
+                if not projects_obj:
+                    comments.append("-12: div with projects not found")
+                    return total_points, comments
+                comments.append("-5: div with id=projects not found (partial points awarded)")
+                deduct_points_for_id = True
         project_items = projects_obj.find_all("div", {"class": "carousel-item"})
         quantity = len(project_items)
         if len(project_items) >= 3:
             total_points += 2
         else:
-            comments.append("-2: less than 3 projects added")
-        bottom_indicators = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_BTM_INDS", ""))
-        buttons = bottom_indicators.find_all("button")
-        if len(buttons) >= 3:
-            total_points += 2
+            comments.append(f"-{2 + ((3-quantity) * 2)}: less than 3 projects added")
+        bottom_indicators = projects_obj.select(".carousel-indicators")
+        if len(bottom_indicators) > 0:
+            c = 0
+            for child in bottom_indicators[0].findChildren():
+                c += 1
+            if c >= 3:
+                total_points += 2
+            else:
+                comments.append('-2: carousel bottom indicators are not found')
         else:
             comments.append('-2: carousel bottom indicators are not found')
-        prev_control = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_CONTROL_PREV", ""))
-        next_control = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_CONTROL_NEXT", ""))
+
+        prev_control, next_control = None, None
+        try:
+            prev_control = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_CONTROL_PREV", "")) or projects_obj.select(".carousel-control-prev")[0]
+        except IndexError:
+            pass
+        try:
+            next_control = projects_obj.find(id=COMPONENT_IDS.get("CAROUSEL_CONTROL_NEXT", "")) or projects_obj.select(".carousel-control-next")[0]
+        except IndexError:
+            pass
         if prev_control:
             total_points += 1
         else:
@@ -173,11 +204,17 @@ class Lab4:
             comments.append("-1: next project indicator is not found")
         for i in range(quantity):
             carousel_item = projects_obj.find(id=f'{COMPONENT_IDS.get("CAROUSEL_ITEM_PREFIX", "")}{i+1}')
+            if not carousel_item:
+                carousel_item = projects_obj.find_all("div", { "class": "carousel-item" })
+                if len(carousel_item) == 0:
+                    comments.append(f"-2: carousel item {i+1} not found")
+                    continue
+                carousel_item = carousel_item[i]
             card_img = carousel_item.find('img')
             if card_img:
                 total_points += 1
             else:
-                comments.append("-1: project image is not found")
+                comments.append(f"-1: image is not found for project{i+1}")
 
             # TODO: validate img path is valid or not
             heading_tags = ["h1", "h2", "h3", 'h4', 'h5', 'h6']
@@ -185,15 +222,16 @@ class Lab4:
             if len(card_title) > 0:
                 total_points += 0.5
             else:
-                comments.append("-0.5: project title is not found")
+                comments.append(f"-0.5: title is not found for project{i+1}")
             card_desc = carousel_item.find("p")
             if not card_desc:
                 card_desc = carousel_item.find("span")
             if card_desc:
                 total_points += 0.5
             else:
-                comments.append("-0.5: project desc is not found")
-
+                comments.append(f"-0.5: desc is not found for project{i+1}")
+        if deduct_points_for_id:
+            total_points -= 5
         return total_points, comments
             
     def grade_resume(self):
@@ -223,16 +261,21 @@ class Lab4:
 
         resume_obj = self.file_obj.find(id=COMPONENT_IDS.get("RESUME", ""))
         if not resume_obj:
-            obj = self.file_obj.find_all("div", {"class": "resume"})
-            if len(obj) == 0:
-                comments.append("-6: resume div not found")
+            resume_obj = self.file_obj.find_all("div", {"class": "resume"})
+            if len(resume_obj) == 0:
+                tables = self.file_obj.find_all("table")
+                if len(tables) > 0:
+                    total_points += 8
+                    comments.append("-2: div with id=resume not found (partial points awarded)")
+                else:
+                    comments.append("-10: did not use table for resume")
                 return total_points, comments
-            resume_obj = obj[0]
+            resume_obj = resume_obj[0]
         tables = resume_obj.find_all("table")
         if len(tables) > 0:
-            total_points += 6
+            total_points += 10
         else:
-            comments.append("-6: did not use table for resume")
+            comments.append("-10: did not use table for resume")
 
         return total_points, comments
 
@@ -269,7 +312,7 @@ class Lab4:
                     item_points, item_comments = eval(f"self.grade_{item['component_id']}()")
                     sub_section_points += item_points
                     sub_section_comments.extend(item_comments)
-                details = [f"[Section: {section['section_name']} Subsection: {sub_section['name']}]"]
+                details = [f'<<[Section: {section["section_name"]} Subsection: {sub_section["name"]}]>>']
                 section_points += sub_section_points
                 if len(sub_section_comments) > 0:
                     section_comments.extend(details)
