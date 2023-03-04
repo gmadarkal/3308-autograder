@@ -281,10 +281,12 @@ class Lab4:
 
     def get_submission_file_obj(self, submission, sub_section_name):
         file_path = os.path.join(self.submissions_folder, submission, self.views_folder, sub_section_name)
-        with open(file_path, encoding='utf8') as html_file:
-            file_contents = html_file.read()
-        file_obj = BeautifulSoup(file_contents, 'html.parser')
-        return file_obj
+        if os.path.exists(file_path):
+            with open(file_path, encoding='utf8') as html_file:
+                file_contents = html_file.read()
+            file_obj = BeautifulSoup(file_contents, 'html.parser')
+            return file_obj
+        return None
 
     def grade(self, submission):
         rubric_path = './autograder/lab4/rubric/lab4.json'
@@ -305,14 +307,17 @@ class Lab4:
                 sub_section_points = 0
                 sub_section_comments = []
                 self.file_obj = self.get_submission_file_obj(submission, sub_section['name'])
-                for item in sub_section['items']:
-                    self.log_debug(f"grading item: {item['component_id']}, total points: {item['item_point']}")
-                    # if sub_section['name'] == 'hobbies.html':
-                    #     print("soemthing")
-                    item_points, item_comments = eval(f"self.grade_{item['component_id']}()")
-                    sub_section_points += item_points
-                    sub_section_comments.extend(item_comments)
                 details = [f'<<[Section: {section["section_name"]} Subsection: {sub_section["name"]}]>>']
+                if self.file_obj:
+                    for item in sub_section['items']:
+                        self.log_debug(f"grading item: {item['component_id']}, total points: {item['item_point']}")
+                        # if sub_section['name'] == 'hobbies.html':
+                        #     print("soemthing")
+                        item_points, item_comments = eval(f"self.grade_{item['component_id']}()")
+                        sub_section_points += item_points
+                        sub_section_comments.extend(item_comments)
+                else:
+                    sub_section_comments.extend([f"submission file: {sub_section['name']} not found"])
                 section_points += sub_section_points
                 if len(sub_section_comments) > 0:
                     section_comments.extend(details)
