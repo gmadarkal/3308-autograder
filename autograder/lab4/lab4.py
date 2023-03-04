@@ -11,7 +11,7 @@ class Lab4:
         self.files = ['index.html', 'projects.html', 'hobbies.html', 'resume.html']
         self.debug = debug
         self.file_obj = None
-        self.views_folder = "Lab_Website\\views"
+        self.views_folder = os.path.join("Lab_Website", "views")
     
     def log_info(self, msg):
         print(msg)

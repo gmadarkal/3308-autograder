@@ -8,11 +8,9 @@ class Lab5:
     def __init__(self, submissions_folder, submissions, debug=False) -> None:
         self.submissions_folder = submissions_folder
         self.submissions = submissions
-        self.files = ['index.html', 'projects.html', 'hobbies.html', 'resume.html']
         self.debug = debug
         self.file_obj = None
-        self.views_folder = "Lab_Website\\views"
-    
+
     def log_info(self, msg):
         print(msg)
     

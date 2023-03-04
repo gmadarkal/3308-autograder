@@ -15,7 +15,7 @@ For more information on the rubric and automation script please look at file lab
 
 - Install node_module by changing the directory to the respective lab
 
-``` cd ./autograder/lab5/ ```
+``` cd ./autograder/lab5/js-test/ ```
 
 ``` npm install ``` 
 
