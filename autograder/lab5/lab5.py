@@ -19,8 +19,8 @@ class Lab5:
             print(msg)
 
     def start(self):
-        with open('grades.csv', 'a') as g:
-            g.write(",".join(["Name","dirStructurePoints","html","initializeContent","createUpdateEvents","updateDom","openEventModal","updateEventFromModal","updateTooltips","Comments\n"]))
+        with open(os.path.join(self.submissions_folder,'grades.csv'), 'a') as g:
+            g.write(",".join(["Name","dirStructurePoints: 5pts","html: 5pts","initializeContent: 10pts","createUpdateEvents: 10pts","updateDom: 10pts","openEventModal: 10pts","updateEventFromModal: 10pts","updateTooltips: 20pts","Attendance","Total","Comments", "Errors\n"]))
         for submission in self.submissions:
             if os.path.isdir(os.path.join(self.submissions_folder, submission)):
                 try:
