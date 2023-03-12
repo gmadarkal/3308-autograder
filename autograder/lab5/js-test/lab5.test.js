@@ -16,6 +16,28 @@ const cleanMsg = (msg) => {
     return msg.replace(",", "; ").replace("\n", "; ")
 }
 
+const getFnBody = (fnName, scriptContents) => {
+    const fnIndex = scriptContents.indexOf(`function ${fnName}`)
+    const fnScope = [];
+    let fnBody = "";
+    // let first = false;
+    if (fnIndex > -1) {
+        for (let i = fnIndex; i < scriptContents.length; i++) {
+            if (scriptContents[i] === "{") {
+                fnScope.push("{")
+            } else if (scriptContents[i] === "}") {
+                fnScope.pop();
+                if (fnScope.length === 0) {
+                    break;
+                }
+            } else {
+                fnBody += scriptContents[i];
+            }
+        }
+    }
+    return fnBody;
+}
+
 describe("testing lab5", () => {
 
     // ------------SETUP-------------
@@ -435,9 +457,15 @@ describe("testing lab5", () => {
                                 sectionPoints['comments'] += `-2: event field: ${fields[idx]} is not updated in function: updateEventFromModal; `;
                             }
                         });
-                        console.log(CALENDAR_EVENTS);
                     } else {
-                        sectionPoints['comments'] += `-10: updateEventFromModal fn. does not work as expected; `;
+                        const fnBody = getFnBody("updateEventFromModal", scriptContents)
+                        const matchLen = (fnBody.match(/document.querySelector/g) || []).length
+                        if (matchLen >= 3) {
+                            sectionPoints['points'] += 7
+                            sectionPoints['comments'] += "-3: updateEventFromModal fn. does not use the div ids mentioned in the lab writeup; "
+                        } else {
+                            sectionPoints['comments'] += `-10: updateEventFromModal fn. does not work as expected; `;
+                        }
                     }
                 } else {
                     sectionPoints['comments'] += "-10: CALENDAR EVENTS object is missing; "
